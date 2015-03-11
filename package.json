@@ -1,0 +1,36 @@
+{
+  "author": {
+    "name": "Petr Ystyugov",
+    "email": "senap@bk.ru",
+    "url": "https://github.com/SeNaP/"
+  },
+  "contributors": [
+    {
+      "name": "salba"
+    }
+  ],
+  "name": "robokassa",
+  "description": "Robokassa merchant",
+  "tags": [
+    "robokassa",
+    "robokassa api"
+  ],
+  "version": "0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SeNaP/node-robokassa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SeNaP/node-robokassa/issues"
+  },
+  "main": "robokassa.js",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "MD5": ">= 1.2.1"
+  },
+  
+  "optionalDependencies": {},
+  "homepage": "https://github.com/SeNaP/node-robokassa"
+}
