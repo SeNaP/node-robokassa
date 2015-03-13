@@ -37,16 +37,14 @@ Robokassa.prototype.merchantUrl = function(order){
 Robokassa.prototype.checkPayment = function(req){
 	/*
 	*  --- check payment ---
-	* req.params.InvId
-	* req.params.SignatureValue
-	* req.params.OutSum
+	* req.InvId
+	* req.SignatureValue
+	* req.OutSum
 	*
 	*/
+	this.crc = md5(req.OutSum+":"+req.SignatureValue+":"+this.pass1);
 
-	if(this.crc != req.params.SignatureValue)
-		return false
-	else
-		return true;
+	return this.crc == req.SignatureValue;
 };
 
 module.exports = Robokassa;

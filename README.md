@@ -1,44 +1,57 @@
-# Robokassa
+# Node - Robokassa
 
+> This is node package for work with robokassa.ru API
 
+### Installation
 
-## Installation
-
-
-### [Node.js](http://nodejs.org/):
-
-```
-npm install robokassa
+```sh
+$ npm install robokassa
 ```
 
-## Usage
-
-~~~ javascript
+### Usage:
+```javascript
 var Robokassa = require('robokassa');
-var  r = new Robokassa({login: "login", password: "password"});
+var  r = new Robokassa({login: "login", password: "pa$$w0rd"});
+/*
+* generate merchat link
+* return https://auth.robokassa.ru/Merchant/Index.aspx?MrchLogin=.... .... .....
+*/
+r.merchantUrl({ id: "invoice number", summ: 500, description: "description of invoice"});
+/*
+* check payment 
+* return true if success else return false
+*/
+r.checkPayment(req.params);
+```
 
-r.merchantUrl({ id: 1, summ: '1200', description: 'product description'}); // retrun payment url link on robokassa 
+#### Example for express:
 
-r.checkPayment(req); //retrun true if success else false
-~~~
-
-Example for express
-
-~~~ javascript
-
-express.get('/product/:id', function (req, res){
-	link = r.merchantUrl({ id: req.params.id, summ: '1200', description: 'product description' });
+```javascript
+express.get('/', function (req, res){
+	link = r.merchantUrl({ id: "invoice number", summ: 500, description: "description"});
 	res.render('index', { paymentLink: link});
 });
 
-express.get('/payment/result', function(req, res){
-	if(r.checkPayment(req)){
-		message = "Success";
-	}else{
-		message = "Fail";
-	}
 
-	res.render('payment_result', { msg: message});
+express.get('/payment/result', function (req, res){
+    if(r.checkPayment(req.params)){
+        console.log("PAYMENT SUCCESS!");
+    }else{
+    	console.log("PAYMENT NOT SUCCESS!");
+    }
 });
 
-~~~
+express.get('/payment/true', function (req, res){
+    res.render('payment_true');
+});
+
+express.get('/payment/false', function (req, res){
+	res.render('payment_false');
+});
+```
+
+### links
+
+* [node.js](https://nodejs.org/) - evented I/O for the backend
+* [Express](http://expressjs.com/api.html) - fast node.js network app framework [@tjholowaychuk]
+* [robokassa.ru](http://www.robokassa.ru/ru/Doc/Ru/Interface.aspx) - Robokassa API
