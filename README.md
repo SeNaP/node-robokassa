@@ -27,6 +27,9 @@ r.checkPayment(req.params);
 #### Example for express:
 
 ```javascript
+var Robokassa = require('robokassa');
+var  r = new Robokassa({login: "login", password: "pa$$w0rd"});
+
 express.get('/', function (req, res){
 	link = r.merchantUrl({ id: "invoice number", summ: 500, description: "description"});
 	res.render('index', { paymentLink: link});
