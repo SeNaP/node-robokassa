@@ -11,7 +11,9 @@ var Robokassa = function (configuration) {
 	this.login1 = configuration.login;      // your login here
 	this.pass1  = configuration.password;   // merchant pass1 here
 
-	this.url 	= "https://auth.robokassa.ru/Merchant/Index.aspx";
+	 // you can pass any connection url
+	 // like test server: http://test.robokassa.ru/Index.aspx
+	this.url 	= (configuration.url || "https://auth.robokassa.ru/Merchant/Index.aspx");
 };
 
 Robokassa.prototype.merchantUrl = function(order){
