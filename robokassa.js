@@ -8,6 +8,7 @@ function Robokassa(opts) {
 	this.pass2 = opts.password2;
 	this.hashType = opts.hash || 'md5';
 	this.url = opts.url || 'https://auth.robokassa.ru/Merchant/Index.aspx';
+	this.paramPrefix = opts.paramPrefix || '_';
 }
 
 Robokassa.prototype.merchantUrl = function(order) {
@@ -23,7 +24,7 @@ Robokassa.prototype.merchantUrl = function(order) {
 
 	order.id = order.id || 0;
 
-	var userParams = extractUserParams(order);
+	var userParams = extractUserParams(order, this.paramPrefix);
 	var crcStr = [this.login, order.summ, order.id, this.pass1].join(':');
 	var query = {
 		MrchLogin: this.login,
@@ -32,16 +33,14 @@ Robokassa.prototype.merchantUrl = function(order) {
 		Desc: order.description
 	};
 
-	if (order.currency) query.sIncCurrLabel = order.currency;
-	if (order.lang) query.sCulture = order.lang;
+	if (order.currency) query.OutSumCurrency = order.currency;
+	if (order.lang) query.Culture = order.lang;
 
-	if (userParams) {
-		var keys = Object.keys(userParams).sort();
-
-		for (var i = 0; i < keys.length; i++) {
-			var key = keys[i];
-			crcStr = crcStr + ':shp' + key + '=' + userParams[key];
-			query['shp' + key] = userParams[key];
+	if (userParams.length > 0) {
+		for (var i = 0; i < userParams.length; i++) {
+			var key = userParams[i];
+			crcStr = crcStr + ':shp' + key + '=' + order[key];
+			query['shp' + key] = order[key];
 		}
 	}
 
@@ -50,7 +49,7 @@ Robokassa.prototype.merchantUrl = function(order) {
 	return this.url + '?' + queryStr(query);
 };
 
-Robokassa.prototype.checkPayment = function(req) {
+Robokassa.prototype.checkPayment = function(req, userFirstPass) {
 	/*
 	 *  --- check payment ---
 	 * req.InvId
@@ -67,11 +66,15 @@ Robokassa.prototype.checkPayment = function(req) {
 		var key = keys[i];
 
 		if (key.substring(0, 3) === 'shp') {
-			userParams.push(key + '=' + req[key]);
+			var val = req[key];
+			userParams.push(key + '=' + val);
+
+			delete req[key];
+			req[key.substring(3)] = val;
 		}
 	}
 
-	var crcOpts = [req.OutSum, req.InvId, this.pass2];
+	var crcOpts = [req.OutSum, req.InvId, userFirstPass ? this.pass1 : this.pass2];
 
 	if (userParams.length > 0) {
 		for (i = 0; i < userParams.length; i++) {
@@ -89,27 +92,20 @@ function hash(data, type) {
 		.digest('hex');
 }
 
-function clone(obj) {
-	if (null === obj || 'object' !== typeof obj) return obj;
-	var copy = obj.constructor();
-	for (var attr in obj) {
-		if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+function extractUserParams(obj, prefix) {
+	var result = [];
+	var keys = Object.keys(obj);
+	var key;
+
+	for (var i = 0, len = keys.length; i < len; ++i) {
+		key = keys[i];
+
+		if (key.substring(0, prefix.length) === prefix) {
+			result.push(key);
+		}
 	}
-	return copy;
-}
 
-function extractUserParams(order) {
-	var params = clone(order);
-
-	delete params.id;
-	delete params.description;
-	delete params.summ;
-	delete params.currency;
-	delete params.lang;
-
-	if (Object.keys(params).length > 0) {
-		return params;
-	}
+	return result;
 }
 
 function queryStr(obj) {
