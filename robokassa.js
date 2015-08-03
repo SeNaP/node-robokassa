@@ -25,7 +25,8 @@ Robokassa.prototype.merchantUrl = function(order) {
 	order.id = order.id || 0;
 
 	var userParams = extractUserParams(order, this.paramPrefix);
-	var crcStr = [this.login, order.summ, order.id, this.pass1].join(':');
+	var crcOpts = [this.login, order.summ, order.id];
+
 	var query = {
 		MrchLogin: this.login,
 		OutSum: order.summ,
@@ -33,18 +34,24 @@ Robokassa.prototype.merchantUrl = function(order) {
 		Desc: order.description
 	};
 
-	if (order.currency) query.OutSumCurrency = order.currency;
+	if (order.currency) {
+		crcOpts.push(order.currency);
+		query.OutSumCurrency = order.currency;
+	}
+
 	if (order.lang) query.Culture = order.lang;
+
+	crcOpts.push(this.pass1);
 
 	if (userParams.length > 0) {
 		for (var i = 0; i < userParams.length; i++) {
 			var key = userParams[i];
-			crcStr = crcStr + ':shp' + key + '=' + order[key];
+			crcOpts.push('shp' + key + '=' + order[key]);
 			query['shp' + key] = order[key];
 		}
 	}
 
-	query.SignatureValue = hash(crcStr, this.hashType);
+	query.SignatureValue = hash(crcOpts.join(':'), this.hashType);
 
 	return this.url + '?' + queryStr(query);
 };
