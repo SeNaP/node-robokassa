@@ -15,7 +15,7 @@
     "robokassa",
     "robokassa api"
   ],
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/SeNaP/node-robokassa.git"
@@ -26,11 +26,7 @@
   "main": "robokassa.js",
   "engines": {
     "node": "*"
-  },
-  "dependencies": {
-    "MD5": ">= 1.2.1"
-  },
-  
+  }, 
   "optionalDependencies": {},
   "homepage": "https://github.com/SeNaP/node-robokassa"
 }
